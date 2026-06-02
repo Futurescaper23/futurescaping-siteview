@@ -1,0 +1,61 @@
+{
+  "projectTitle": "FutureScaping SiteView",
+  "clientName": "Client Name",
+  "siteName": "Site or Property Name",
+  "subtitle": "Drone survey layer viewer and site visualisation",
+  "desktopNote": "This viewer is best experienced on a laptop or desktop, especially when comparing layers or reviewing scaled drawings.",
+  "layerImages": [
+    {
+      "id": "main",
+      "name": "Main image",
+      "description": "Current orthomosaic site image.",
+      "file": "/assets/images/main-image.jpg",
+      "color": "#d9dee8",
+      "defaultOpacity": 1
+    },
+    {
+      "id": "height",
+      "name": "Height colours",
+      "description": "Height-coloured surface layer for reading changes in level.",
+      "file": "/assets/images/height-colours.png",
+      "color": "#70b8ff",
+      "defaultOpacity": 0.7
+    },
+    {
+      "id": "contours",
+      "name": "Contour lines",
+      "description": "Contour line overlay for understanding gradients and levels.",
+      "file": "/assets/images/contour-lines.png",
+      "color": "#ffd36a",
+      "defaultOpacity": 0.85
+    }
+  ],
+  "panorama": {
+    "label": "360 Property View",
+    "file": "/assets/panoramas/site-panorama.JPG"
+  },
+  "externalLinks": [
+    {
+      "label": "Open 3D model",
+      "type": "model",
+      "provider": "Nira",
+      "url": "https://example.com/model"
+    }
+  ],
+  "downloads": [
+    {
+      "label": "Scaled drawing",
+      "description": "Original exported PDF drawing.",
+      "file": "/assets/drawings/scaled-drawing.pdf",
+      "type": "pdf",
+      "paperSize": "A1",
+      "scale": "1:100"
+    },
+    {
+      "label": "Drawing pack",
+      "description": "ZIP file containing the exported project drawing pack.",
+      "file": "/assets/downloads/drawing-pack.zip",
+      "type": "zip"
+    }
+  ]
+}

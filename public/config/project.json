@@ -1,0 +1,154 @@
+{
+  "projectTitle": "FutureScaping SiteView",
+  "clientName": "FutureScaping Labs",
+  "siteName": "Demo Evidence Pack",
+  "subtitle": "Interactive drone-based site visualisation for planning, design and site understanding.",
+  "desktopNote": "For the clearest layer comparison and drawing review, this workspace is best on a laptop or desktop screen.",
+  "heroImage": "/assets/images/hero-floating-site.png",
+  "quickFacts": [
+    {
+      "label": "Demo",
+      "value": "Anonymised site"
+    },
+    {
+      "label": "Outputs",
+      "value": "3 visual layers + 360 panorama"
+    },
+    {
+      "label": "Use",
+      "value": "Planning, design and site understanding"
+    }
+  ],
+  "viewpoints": [
+    {
+      "id": 1,
+      "title": "Access View",
+      "label": "Arrival and access sequence",
+      "x": "15%",
+      "y": "69%"
+    },
+    {
+      "id": 2,
+      "title": "Central View",
+      "label": "Primary context area",
+      "x": "39%",
+      "y": "55%"
+    },
+    {
+      "id": 3,
+      "title": "Amenity View",
+      "label": "Amenity and built-form relationship",
+      "x": "58%",
+      "y": "44%"
+    },
+    {
+      "id": 4,
+      "title": "Boundary View",
+      "label": "Boundary and extent review",
+      "x": "76%",
+      "y": "17%"
+    }
+  ],
+  "mapLayers": [
+    {
+      "id": "main",
+      "label": "Orthomosaic base",
+      "enabled": true
+    },
+    {
+      "id": "height",
+      "label": "Height colours",
+      "enabled": true
+    },
+    {
+      "id": "contours",
+      "label": "Contour lines",
+      "enabled": true
+    },
+    {
+      "id": "buildings",
+      "label": "Existing buildings",
+      "enabled": true
+    },
+    {
+      "id": "access",
+      "label": "Access route",
+      "enabled": true
+    },
+    {
+      "id": "viewpoints",
+      "label": "Viewpoints",
+      "enabled": true
+    },
+    {
+      "id": "tree-cover",
+      "label": "Tree cover",
+      "enabled": true
+    }
+  ],
+  "layerImages": [
+    {
+      "id": "main",
+      "name": "Orthomosaic image",
+      "description": "Current orthomosaic site image.",
+      "file": "/assets/images/main-image.jpg",
+      "color": "#d9dee8",
+      "defaultOpacity": 1
+    },
+    {
+      "id": "height",
+      "name": "Height colours",
+      "description": "Height-coloured surface layer for reading changes in level.",
+      "file": "/assets/images/height-colours.png",
+      "color": "#70b8ff",
+      "defaultOpacity": 0.7
+    },
+    {
+      "id": "contours",
+      "name": "Contour lines",
+      "description": "Contour line overlay for understanding gradients and levels.",
+      "file": "/assets/images/contour-lines.png",
+      "color": "#ffd36a",
+      "defaultOpacity": 0.85
+    }
+  ],
+  "panorama": {
+    "label": "360 Property View",
+    "file": "/assets/panoramas/site-panorama.JPG"
+  },
+  "externalLinks": [
+    {
+      "label": "Open 3D model",
+      "type": "model",
+      "provider": "Nira",
+      "url": "https://futurescaping.nira.app/a/KF0fDtX1Q4CUIJ8tgQhknw/1"
+    }
+  ],
+  "downloads": [
+    {
+      "label": "Site plan",
+      "description": "Scaled site plan PDF for planning and review.",
+      "file": "/assets/drawings/site-plan-1-100.pdf",
+      "type": "pdf",
+      "scale": "1:100"
+    },
+    {
+      "label": "Orthomosaic image",
+      "description": "High-resolution orthomosaic image for the current survey.",
+      "file": "/assets/images/main-image.jpg",
+      "type": "image"
+    },
+    {
+      "label": "Height colours image",
+      "description": "Height-coloured layer as exported from the survey workflow.",
+      "file": "/assets/images/height-colours.png",
+      "type": "image"
+    },
+    {
+      "label": "Contour lines image",
+      "description": "Contour overlay image for quick visual reference.",
+      "file": "/assets/images/contour-lines.png",
+      "type": "image"
+    }
+  ]
+}
