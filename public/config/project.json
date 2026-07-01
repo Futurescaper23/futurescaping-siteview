@@ -1,50 +1,55 @@
 {
-  "projectTitle": "FutureScaping SiteView",
-  "clientName": "FutureScaping Labs",
-  "siteName": "Demo Evidence Pack",
-  "subtitle": "Interactive drone-based site visualisation for planning, design and site understanding.",
-  "desktopNote": "For the clearest layer comparison and drawing review, this workspace is best on a laptop or desktop screen.",
-  "heroImage": "/assets/images/hero-floating-site.png",
+  "projectTitle": "SiteView Topographical Survey",
+  "clientName": "Hurstwood Padel",
+  "siteName": "Plumpton Racecourse",
+  "subtitle": "Interactive topographical survey with orthomosaic, DSM, contour overlays and a 360 panorama for paddle court planning.",
+  "desktopNote": "For the clearest layer comparison and drawing review, this topographical survey workspace is best viewed on a laptop or desktop screen.",
+  "heroImage": "/assets/images/3D site view.png",
+  "heroMeta": {
+    "label": "Topographical Survey",
+    "title": "Plumpton Racecourse",
+    "detail": "Prepared for Hurstwood Padel"
+  },
   "quickFacts": [
     {
-      "label": "Demo",
-      "value": "Anonymised site"
+      "label": "Client",
+      "value": "Hurstwood Padel"
     },
     {
       "label": "Outputs",
-      "value": "3 visual layers + 360 panorama"
+      "value": "3 survey layers + 360 panorama"
     },
     {
       "label": "Use",
-      "value": "Planning, design and site understanding"
+      "value": "Topographical review and paddle court planning"
     }
   ],
   "viewpoints": [
     {
       "id": 1,
-      "title": "Access View",
-      "label": "Arrival and access sequence",
+      "title": "Main Survey View",
+      "label": "Overall survey extent",
       "x": "15%",
       "y": "69%"
     },
     {
       "id": 2,
-      "title": "Central View",
-      "label": "Primary context area",
+      "title": "Central Levels",
+      "label": "Primary level changes",
       "x": "39%",
       "y": "55%"
     },
     {
       "id": 3,
-      "title": "Amenity View",
-      "label": "Amenity and built-form relationship",
+      "title": "Eastern Edge",
+      "label": "Boundary and contours",
       "x": "58%",
       "y": "44%"
     },
     {
       "id": 4,
-      "title": "Boundary View",
-      "label": "Boundary and extent review",
+      "title": "Western Edge",
+      "label": "Site edge review",
       "x": "76%",
       "y": "17%"
     }
@@ -52,68 +57,53 @@
   "mapLayers": [
     {
       "id": "main",
-      "label": "Orthomosaic base",
+      "label": "Orthomosaic",
       "enabled": true
     },
     {
-      "id": "height",
-      "label": "Height colours",
+      "id": "dsm",
+      "label": "DSM surface model",
       "enabled": true
     },
     {
       "id": "contours",
-      "label": "Contour lines",
-      "enabled": true
-    },
-    {
-      "id": "buildings",
-      "label": "Existing buildings",
-      "enabled": true
-    },
-    {
-      "id": "access",
-      "label": "Access route",
+      "label": "Contour overlay",
       "enabled": true
     },
     {
       "id": "viewpoints",
       "label": "Viewpoints",
       "enabled": true
-    },
-    {
-      "id": "tree-cover",
-      "label": "Tree cover",
-      "enabled": true
     }
   ],
   "layerImages": [
     {
       "id": "main",
-      "name": "Orthomosaic image",
-      "description": "Current orthomosaic site image.",
-      "file": "/assets/images/main-image.jpg",
+      "name": "Orthomosaic",
+      "description": "Clean orthomosaic image for the site without contour linework.",
+      "file": "/assets/downloads/ortho.png",
       "color": "#d9dee8",
       "defaultOpacity": 1
     },
     {
-      "id": "height",
-      "name": "Height colours",
-      "description": "Height-coloured surface layer for reading changes in level.",
+      "id": "dsm",
+      "name": "DSM surface model",
+      "description": "Digital surface model export for reading terrain and level changes across the site.",
       "file": "/assets/images/height-colours.png",
       "color": "#70b8ff",
       "defaultOpacity": 0.7
     },
     {
       "id": "contours",
-      "name": "Contour lines",
-      "description": "Contour line overlay for understanding gradients and levels.",
-      "file": "/assets/images/contour-lines.png",
+      "name": "Contour overlay",
+      "description": "Black contour overlay for comparing gradients and levels against the other survey outputs.",
+      "file": "/assets/downloads/contours-black.png",
       "color": "#ffd36a",
       "defaultOpacity": 0.85
     }
   ],
   "panorama": {
-    "label": "360 Property View",
+    "label": "360 Site Panorama",
     "file": "/assets/panoramas/site-panorama.JPG"
   },
   "externalLinks": [
@@ -121,33 +111,46 @@
       "label": "Open 3D model",
       "type": "model",
       "provider": "Nira",
-      "url": "https://futurescaping.nira.app/a/KF0fDtX1Q4CUIJ8tgQhknw/1"
+      "url": "https://futurescaping.nira.app/a/oypHd_hvSlCInCi7-6UofQ/1"
     }
   ],
   "downloads": [
     {
-      "label": "Site plan",
-      "description": "Scaled site plan PDF for planning and review.",
-      "file": "/assets/drawings/site-plan-1-100.pdf",
+      "label": "Site plan with contour lines PDF",
+      "description": "Printable PDF showing the site image with contour lines overlaid for reference.",
+      "file": "/assets/drawings/ortho-and-contours.pdf",
       "type": "pdf",
-      "scale": "1:100"
+      "scale": "As exported"
     },
     {
-      "label": "Orthomosaic image",
-      "description": "High-resolution orthomosaic image for the current survey.",
-      "file": "/assets/images/main-image.jpg",
+      "label": "Contour lines drawing PDF",
+      "description": "Printable PDF showing the contour line drawing on its own.",
+      "file": "/assets/drawings/contours.pdf",
+      "type": "pdf",
+      "scale": "As exported"
+    },
+    {
+      "label": "Aerial site image PNG",
+      "description": "Clean overhead site image used as the main base layer in the viewer.",
+      "file": "/assets/downloads/ortho.png",
       "type": "image"
     },
     {
-      "label": "Height colours image",
-      "description": "Height-coloured layer as exported from the survey workflow.",
-      "file": "/assets/images/height-colours.png",
+      "label": "Height and level map PNG",
+      "description": "Colour-coded image showing height changes and level differences across the site.",
+      "file": "/assets/downloads/dsm.png",
       "type": "image"
     },
     {
-      "label": "Contour lines image",
-      "description": "Contour overlay image for quick visual reference.",
-      "file": "/assets/images/contour-lines.png",
+      "label": "Contour lines image PNG",
+      "description": "Simple contour line image for quick visual review.",
+      "file": "/assets/downloads/contours.png",
+      "type": "image"
+    },
+    {
+      "label": "Contour overlay PNG",
+      "description": "Transparent contour overlay that can be placed over the aerial site image.",
+      "file": "/assets/downloads/contours-transparent.png",
       "type": "image"
     }
   ]

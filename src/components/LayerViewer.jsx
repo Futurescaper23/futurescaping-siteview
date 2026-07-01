@@ -27,17 +27,26 @@ export default function LayerViewer({ layers }) {
   const [controlsVisible, setControlsVisible] = useState(true);
   const [swipe, setSwipe] = useState(50);
   const [scale, setScale] = useState(1);
-  const [fitMode, setFitMode] = useState("fill");
+  const [fitMode, setFitMode] = useState("fit");
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [stageAspectRatio, setStageAspectRatio] = useState("16 / 9");
+  const [stageAspectRatio, setStageAspectRatio] = useState(16 / 9);
   const [interaction, setInteraction] = useState(null);
   const [visibleLayers, setVisibleLayers] = useState(() => buildLayerState(layers, "visible", true));
   const [opacities, setOpacities] = useState(() => buildLayerState(layers, "defaultOpacity", 1));
 
   const comparePairs = useMemo(() => getComparePairs(layers), [layers]);
   const [compareId, setCompareId] = useState(comparePairs[0]?.id);
+  const [singleLayerId, setSingleLayerId] = useState(layers[0]?.id);
   const activePair = comparePairs.find((pair) => pair.id === compareId) || comparePairs[0];
   const layerById = useMemo(() => Object.fromEntries(layers.map((layer) => [layer.id, layer])), [layers]);
+  const activeSingleLayer = layerById[singleLayerId] || layers[0];
+
+  useEffect(() => {
+    if (!layers.length) return;
+    if (!singleLayerId || !layerById[singleLayerId]) {
+      setSingleLayerId(layers[0].id);
+    }
+  }, [layerById, layers, singleLayerId]);
 
   useEffect(() => {
     const referenceLayer = layers[0];
@@ -47,7 +56,7 @@ export default function LayerViewer({ layers }) {
     const image = new Image();
     image.onload = () => {
       if (cancelled || !image.naturalWidth || !image.naturalHeight) return;
-      setStageAspectRatio(`${image.naturalWidth} / ${image.naturalHeight}`);
+      setStageAspectRatio(image.naturalWidth / image.naturalHeight);
       setPan({ x: 0, y: 0 });
     };
     image.src = referenceLayer.file;
@@ -58,15 +67,13 @@ export default function LayerViewer({ layers }) {
   }, [layers]);
 
   function clampPan(nextPan, nextScale = scale) {
-    const effectiveScale = nextScale * (fitMode === "fill" ? 1.25 : 1);
-
-    if (effectiveScale <= 1 || !stageRef.current) {
+    if (nextScale <= 1 || !stageRef.current) {
       return { x: 0, y: 0 };
     }
 
     const rect = stageRef.current.getBoundingClientRect();
-    const maxX = ((rect.width * effectiveScale) - rect.width) / 2;
-    const maxY = ((rect.height * effectiveScale) - rect.height) / 2;
+    const maxX = ((rect.width * nextScale) - rect.width) / 2;
+    const maxY = ((rect.height * nextScale) - rect.height) / 2;
     return {
       x: Math.max(-maxX, Math.min(maxX, nextPan.x)),
       y: Math.max(-maxY, Math.min(maxY, nextPan.y))
@@ -108,6 +115,7 @@ export default function LayerViewer({ layers }) {
     event.currentTarget.setPointerCapture(event.pointerId);
     setInteraction({
       type: "pan",
+      pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
       startPan: pan
@@ -117,8 +125,7 @@ export default function LayerViewer({ layers }) {
   function onStagePointerDown(event) {
     if (mode === "slider") {
       updateSwipeFromClientX(event.clientX);
-      setInteraction({ type: "swipe" });
-      event.currentTarget.setPointerCapture(event.pointerId);
+      setInteraction({ type: "swipe", pointerId: event.pointerId });
       return;
     }
 
@@ -160,7 +167,15 @@ export default function LayerViewer({ layers }) {
       setPan(clampPan(nextPan));
     }
 
-    function onPointerUp() {
+    function onPointerUp(event) {
+      if (interaction.type === "swipe" && interaction.pointerId !== undefined && event.pointerId !== interaction.pointerId) {
+        return;
+      }
+
+      if (interaction.type === "pan" && event.pointerId !== undefined && interaction.pointerId !== undefined && event.pointerId !== interaction.pointerId) {
+        return;
+      }
+
       setInteraction(null);
     }
 
@@ -201,6 +216,9 @@ export default function LayerViewer({ layers }) {
     <main className="viewer-shell">
       <section className="viewer-toolbar" aria-label="Layer viewer controls">
         <div className="segmented-control" aria-label="Comparison mode">
+          <button className={mode === "image" ? "active" : ""} type="button" onClick={() => setMode("image")}>
+            View image
+          </button>
           <button className={mode === "slider" ? "active" : ""} type="button" onClick={() => setMode("slider")}>
             Slider
           </button>
@@ -213,6 +231,19 @@ export default function LayerViewer({ layers }) {
           </button>
         </div>
 
+        {mode === "image" ? (
+          <label className="select-control">
+            <span>Image</span>
+            <select value={activeSingleLayer?.id} onChange={(event) => setSingleLayerId(event.target.value)}>
+              {layers.map((layer) => (
+                <option key={layer.id} value={layer.id}>
+                  {layer.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
         {mode === "slider" ? (
           <label className="select-control">
             <span>Compare</span>
@@ -224,14 +255,13 @@ export default function LayerViewer({ layers }) {
               ))}
             </select>
           </label>
-        ) : (
+        ) : null}
+
+        {mode === "transparency" ? (
           <span className="toolbar-note">Blend any configured layers together.</span>
-        )}
+        ) : null}
 
         <div className="tool-buttons">
-          <button type="button" onClick={() => setFitMode((current) => (current === "fill" ? "fit" : "fill"))}>
-            {fitMode === "fill" ? "Show full image" : "Fill viewer"}
-          </button>
           <button type="button" onClick={() => updateZoom(1 / 1.15)}>Zoom out</button>
           <button type="button" onClick={() => updateZoom(1.15)}>Zoom in</button>
           <button type="button" onClick={() => setControlsVisible((visible) => !visible)}>
@@ -243,56 +273,72 @@ export default function LayerViewer({ layers }) {
       </section>
 
       <section className="viewer-canvas">
-        <div
-          ref={stageRef}
-          className={`image-stage ${scale > 1 ? "is-pannable" : ""} ${interaction?.type === "pan" ? "is-panning" : ""}`}
-          style={{
-            "--zoom-scale": scale,
-            "--fit-scale": fitMode === "fill" ? 1.25 : 1,
-            "--pan-x": `${pan.x}px`,
-            "--pan-y": `${pan.y}px`,
-            aspectRatio: stageAspectRatio
-          }}
-          onPointerDown={onStagePointerDown}
-          onPointerMove={onStagePointerMove}
-          onPointerUp={endInteraction}
-          onPointerCancel={endInteraction}
-          onDoubleClick={resetView}
-        >
-          {mode === "slider" && activePair ? (
-            <SliderCompare
-              baseLayer={layerById[activePair.baseId]}
-              compareLayer={layerById[activePair.compareId]}
-              swipe={swipe}
-              onHandlePointerDown={(event) => {
-                event.stopPropagation();
-                event.currentTarget.setPointerCapture(event.pointerId);
-                setInteraction({ type: "swipe" });
-              }}
-            />
-          ) : null}
+        <div className="viewer-stage-wrap">
+          <div
+            ref={stageRef}
+            className={`image-stage ${scale > 1 ? "is-pannable" : ""} ${interaction?.type === "pan" ? "is-panning" : ""}`}
+            style={{
+              "--zoom-scale": scale,
+              "--pan-x": `${pan.x}px`,
+              "--pan-y": `${pan.y}px`,
+              "--image-fit": fitMode === "fill" ? "cover" : "contain",
+              aspectRatio: stageAspectRatio
+            }}
+            onPointerDown={onStagePointerDown}
+            onPointerMove={onStagePointerMove}
+            onPointerUp={endInteraction}
+            onPointerCancel={endInteraction}
+            onDoubleClick={resetView}
+          >
+            {mode === "image" && activeSingleLayer ? (
+              <div className="image-layer image-layer--single" style={{ opacity: 1 }}>
+                <img src={activeSingleLayer.file} alt={activeSingleLayer.name} draggable="false" />
+              </div>
+            ) : null}
 
-          {mode === "transparency"
-            ? layers.map((layer) => (
-                <div
-                  className="image-layer"
-                  key={layer.id}
-                  style={{ opacity: visibleLayers[layer.id] ? opacities[layer.id] : 0 }}
-                >
-                  <img src={layer.file} alt={layer.name} draggable="false" />
-                </div>
-              ))
-            : null}
+            {mode === "slider" && activePair ? (
+              <SliderCompare
+                baseLayer={layerById[activePair.baseId]}
+                compareLayer={layerById[activePair.compareId]}
+                swipe={swipe}
+                onHandlePointerDown={(event) => {
+                  event.stopPropagation();
+                  setInteraction({ type: "swipe", pointerId: event.pointerId });
+                }}
+              />
+            ) : null}
+
+            {mode === "transparency"
+              ? layers.map((layer) => (
+                  <div
+                    className="image-layer"
+                    key={layer.id}
+                    style={{ opacity: visibleLayers[layer.id] ? opacities[layer.id] : 0 }}
+                  >
+                    <img src={layer.file} alt={layer.name} draggable="false" />
+                  </div>
+                ))
+              : null}
+          </div>
         </div>
 
         {controlsVisible ? (
           <aside className="side-panel">
+            {mode === "image" ? (
+              <>
+                <h2>Image view</h2>
+                <p>Review one image at a time without comparison controls or overlays.</p>
+              </>
+            ) : null}
+
             {mode === "slider" ? (
               <>
                 <h2>Slider mode</h2>
                 <p>Pick two layers and drag the vertical handle across the image to compare them.</p>
               </>
-            ) : (
+            ) : null}
+
+            {mode === "transparency" ? (
               <>
                 <h2>Transparency mode</h2>
                 <p>Switch layers on or off and adjust how strongly each one appears.</p>
@@ -308,7 +354,7 @@ export default function LayerViewer({ layers }) {
                   }
                 />
               </>
-            )}
+            ) : null}
             <div className="panel-rule">
               At maximum zoom out, the view stays locked. Once zoomed in, drag the image to pan inside the bounds.
             </div>

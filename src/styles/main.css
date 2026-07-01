@@ -446,10 +446,10 @@ p {
 }
 
 .hero-stage-image--shell {
-  object-fit: cover;
+  inset: 26px 110px 26px 110px;
+  object-fit: contain;
   object-position: center center;
   filter: brightness(1.04) saturate(1.02) contrast(1.01);
-  transform: scale(0.88);
 }
 
 @keyframes heroFloat {
@@ -547,25 +547,12 @@ p {
   border-radius: 18px;
 }
 
-.hero-action-dock h3 {
-  margin: 0 0 8px;
-  font-size: 0.88rem;
-  line-height: 1.15;
-}
-
-.hero-action-dock p {
-  margin: 0;
-  font-size: 0.7rem;
-}
-
 .hero-action-dock__buttons {
   display: grid;
   gap: 8px;
-  margin-top: 12px;
 }
 
 .hero-action-dock__primary {
-  min-height: 40px;
   background: linear-gradient(180deg, var(--accent-2) 0%, var(--accent) 100%);
   color: var(--accent-ink);
   border-color: transparent;
@@ -576,6 +563,7 @@ p {
 .hero-action-dock .button-link,
 .hero-action-dock button {
   min-height: 36px;
+  width: 100%;
   padding: 8px 12px;
   font-size: 0.82rem;
 }
@@ -602,7 +590,7 @@ p {
 
 .insight-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 0.88fr;
+  grid-template-columns: 1.05fr 1.25fr;
   gap: 18px;
 }
 
@@ -658,38 +646,18 @@ p {
   margin: 6px 0 0;
 }
 
-.map-layers-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.map-layer-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(18, 35, 60, 0.45);
-  border: 1px solid rgba(120, 168, 243, 0.1);
-  color: var(--muted);
-}
-
-.map-layer-row input,
 .check-row input {
   width: 16px;
   height: 16px;
   accent-color: var(--accent);
 }
 
-.map-layer-row.is-active {
-  color: var(--text);
-  border-color: rgba(105, 177, 255, 0.26);
-  background: rgba(37, 67, 114, 0.48);
-}
-
 .workspace-section {
   padding: 24px;
+}
+
+.workspace-section .section-heading {
+  max-width: 980px;
 }
 
 .section-heading {
@@ -770,7 +738,6 @@ select option {
 
 .viewer-canvas {
   position: relative;
-  min-height: 680px;
   overflow: hidden;
   margin-top: 10px;
   background:
@@ -778,17 +745,38 @@ select option {
     linear-gradient(180deg, rgba(16, 28, 48, 0.92), rgba(9, 18, 31, 0.96));
   border: 1px solid rgba(121, 167, 255, 0.1);
   border-radius: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  grid-template-areas:
+    "note note"
+    "stage stage"
+    "legend side";
+  align-items: start;
+  gap: 18px;
   padding: 18px;
+}
+
+.viewer-sheet-note {
+  grid-area: note;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(12, 24, 43, 0.84);
+  border: 1px solid rgba(143, 196, 255, 0.18);
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.viewer-stage-wrap {
+  grid-area: stage;
+  width: 100%;
+  display: grid;
+  place-items: center;
 }
 
 .image-stage {
   position: relative;
-  width: min(100%, 1800px);
-  max-height: 78vh;
-  aspect-ratio: 16 / 9;
+  width: 100%;
   overflow: hidden;
   background: #020611;
   border-radius: 24px;
@@ -821,11 +809,11 @@ select option {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: var(--image-fit, contain);
   pointer-events: none;
   user-select: none;
   background: transparent;
-  transform: translate(var(--pan-x), var(--pan-y)) scale(calc(var(--zoom-scale) * var(--fit-scale)));
+  transform: translate(var(--pan-x), var(--pan-y)) scale(var(--zoom-scale));
   transform-origin: center center;
 }
 
@@ -845,6 +833,8 @@ select option {
   justify-content: center;
   cursor: ew-resize;
   pointer-events: auto;
+  touch-action: none;
+  user-select: none;
 }
 
 .swipe-handle span {
@@ -862,8 +852,7 @@ select option {
 
 .side-panel,
 .legend {
-  position: absolute;
-  z-index: 10;
+  position: relative;
   background: rgba(12, 24, 43, 0.84);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
@@ -871,11 +860,11 @@ select option {
 }
 
 .side-panel {
-  top: 18px;
-  right: 18px;
-  width: min(360px, calc(100vw - 36px));
+  grid-area: side;
+  width: 100%;
   border-radius: 20px;
   padding: 16px;
+  align-self: stretch;
 }
 
 .side-panel h2 {
@@ -929,13 +918,12 @@ select option {
 }
 
 .legend {
-  left: 18px;
-  bottom: 18px;
+  grid-area: legend;
   display: grid;
   gap: 8px;
-  max-width: 300px;
   border-radius: 18px;
   padding: 12px 14px;
+  align-self: end;
 }
 
 .legend-item {
@@ -960,6 +948,34 @@ select option {
 .content-panel {
   width: 100%;
   margin: 0;
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 6px 8px 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.site-footer__legal,
+.site-footer__credit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-footer a {
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
 }
 
 .content-heading {
@@ -1161,6 +1177,14 @@ select option {
     width: min(420px, 100%);
   }
 
+  .hero-stage-image--shell {
+    inset: 88px 42px 140px;
+  }
+
+  .hero-action-dock {
+    width: 220px;
+  }
+
   .benefits-grid,
   .cta-panel {
     grid-template-columns: 1fr;
@@ -1172,14 +1196,6 @@ select option {
 
   .tool-buttons {
     margin-left: 0;
-  }
-
-  .viewer-canvas {
-    min-height: 560px;
-  }
-
-  .image-stage {
-    max-height: 68vh;
   }
 }
 
@@ -1242,20 +1258,16 @@ select option {
 
   .viewer-canvas {
     padding: 12px;
-    min-height: 500px;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "note"
+      "stage"
+      "side"
+      "legend";
   }
 
   .side-panel {
-    left: 12px;
-    right: 12px;
-    top: auto;
-    bottom: 12px;
-    width: auto;
-  }
-
-  .legend {
-    display: none;
+    width: 100%;
   }
 
   .hero-meta-card,
@@ -1268,8 +1280,17 @@ select option {
     margin-top: 14px;
   }
 
+  .hero-meta-card {
+    margin-top: 14px;
+  }
+
+  .hero-action-dock__buttons {
+    gap: 8px;
+  }
+
   .panorama-panel__footer,
-  .cta-panel__actions {
+  .cta-panel__actions,
+  .site-footer {
     display: grid;
   }
 

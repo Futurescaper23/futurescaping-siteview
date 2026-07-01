@@ -12,11 +12,10 @@ const workspaceTabs = [
 
 const heroNavItems = [
   { id: "overview", label: "Overview", icon: "home" },
-  { id: "viewer", label: "3D View", icon: "scene" },
+  { id: "viewpoints", label: "Viewpoints", icon: "marker" },
+  { id: "viewer", label: "Viewer", icon: "scene" },
   { id: "panorama", label: "Panoramas", icon: "lens" },
-  { id: "downloads", label: "Outputs", icon: "map" },
-  { id: "help", label: "Viewpoints", icon: "marker" },
-  { id: "contact", label: "Contact", icon: "spark" }
+  { id: "downloads", label: "Outputs", icon: "map" }
 ];
 
 function HeroRailIcon({ icon }) {
@@ -61,12 +60,6 @@ function HeroRailIcon({ icon }) {
           <circle cx="12" cy="10" r="1.8"></circle>
         </svg>
       );
-    case "spark":
-      return (
-        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="m12 5 1.7 4.3L18 11l-4.3 1.7L12 17l-1.7-4.3L6 11l4.3-1.7z"></path>
-        </svg>
-      );
     default:
       return null;
   }
@@ -105,22 +98,6 @@ function defaultViewpoints() {
   ];
 }
 
-function defaultMapLayers(config) {
-  const configuredLayers = (config.layerImages || []).map((layer) => ({
-    id: layer.id,
-    label: layer.name,
-    enabled: true
-  }));
-
-  return [
-    ...configuredLayers,
-    { id: "buildings", label: "Existing buildings", enabled: true },
-    { id: "access", label: "Access route", enabled: true },
-    { id: "viewpoints", label: "Viewpoints", enabled: true },
-    { id: "tree-cover", label: "Tree cover", enabled: true }
-  ];
-}
-
 export default function App() {
   const [config, setConfig] = useState(null);
   const [status, setStatus] = useState("loading");
@@ -128,11 +105,9 @@ export default function App() {
   const [panoramaOpen, setPanoramaOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedViewpoint, setSelectedViewpoint] = useState(1);
-  const [selectedMapLayers, setSelectedMapLayers] = useState([]);
 
   const overviewRef = useRef(null);
   const workspaceRef = useRef(null);
-  const contactRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -147,9 +122,8 @@ export default function App() {
         const nextConfig = await response.json();
         if (!cancelled) {
           setConfig(nextConfig);
-          setSelectedMapLayers(defaultMapLayers(nextConfig).filter((item) => item.enabled).map((item) => item.id));
           setStatus("ready");
-          document.title = nextConfig.projectTitle || "FutureScaping SiteView";
+          document.title = nextConfig.projectTitle || "SiteView";
         }
       } catch (error) {
         console.error(error);
@@ -179,7 +153,7 @@ export default function App() {
   }, [config]);
 
   if (status === "loading") {
-    return <main className="status-screen">Loading FutureScaping SiteView...</main>;
+    return <main className="status-screen">Loading SiteView...</main>;
   }
 
   if (status === "error" || !config) {
@@ -195,12 +169,17 @@ export default function App() {
   const heroImage = config.heroImage || mainLayer?.file;
   const viewpoints = config.viewpoints?.length ? config.viewpoints : defaultViewpoints();
   const activeViewpoint = viewpoints.find((item) => item.id === selectedViewpoint) || viewpoints[0];
-  const mapLayers = config.mapLayers?.length ? config.mapLayers : defaultMapLayers(config);
   const heroMeta = config.heroMeta || {
-    label: "Demo",
-    title: config.siteName || "Anonymised site",
-    detail: "Interactive planning evidence workspace"
+    label: "SiteView",
+    title: config.siteName || "Site survey",
+    detail: config.subtitle || "Interactive site survey workspace"
   };
+  const brandName = config.clientName || "FutureScaping Labs";
+  const projectTitle = config.projectTitle || "SiteView";
+  const siteName = config.siteName || "Site survey";
+  const subtitle = config.subtitle || "Interactive drone-based site visualisation.";
+  const footerLink = config.footerLink || "https://futurescaping.co.uk";
+  const copyrightYear = new Date().getFullYear();
 
   function scrollToRef(ref) {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -225,12 +204,6 @@ export default function App() {
     openWorkspace("viewer");
   }
 
-  function toggleMapLayer(layerId) {
-    setSelectedMapLayers((current) =>
-      current.includes(layerId) ? current.filter((entry) => entry !== layerId) : [...current, layerId]
-    );
-  }
-
   return (
     <div className={`app-shell dashboard-shell ${isFullscreen ? "is-fullscreen" : ""}`}>
       <main className="page-stack">
@@ -249,6 +222,10 @@ export default function App() {
                     scrollToRef(overviewRef);
                     return;
                   }
+                  if (item.id === "viewpoints") {
+                    openWorkspace("viewer");
+                    return;
+                  }
                   if (item.id === "viewer") {
                     handleFeatureAction("model");
                     return;
@@ -263,11 +240,6 @@ export default function App() {
                     openWorkspace("downloads");
                     return;
                   }
-                  if (item.id === "help") {
-                    openWorkspace("help");
-                    return;
-                  }
-                  scrollToRef(contactRef);
                 }}
               >
                 <span className="hero-rail__icon" aria-hidden="true">
@@ -286,15 +258,13 @@ export default function App() {
                 <span></span>
               </div>
               <div>
-                <p className="hero-brand__name">FutureScaping Labs</p>
+                <p className="hero-brand__name">{brandName}</p>
               </div>
             </div>
 
-            <h2 className="hero-title">SiteView Planning Evidence</h2>
-            <p className="hero-summary">See the full picture. Plan with confidence.</p>
-            <p className="hero-support">
-              Drone mapping, 3D models, viewpoint evidence and interactive site layers for clearer planning decisions.
-            </p>
+            <h2 className="hero-title">{projectTitle}</h2>
+            <p className="hero-summary">{siteName}</p>
+            <p className="hero-support">{subtitle}</p>
           </div>
 
           <aside className="hero-meta-card">
@@ -304,12 +274,9 @@ export default function App() {
           </aside>
 
           <aside className="hero-action-dock">
-            <p className="hero-action-dock__eyebrow">Open the pack</p>
-            <h3>SiteView Planning Evidence</h3>
-            <p>Open the main working experience for 3D context, viewpoints, maps and technical files.</p>
             <div className="hero-action-dock__buttons">
               <button className="hero-action-dock__primary" type="button" onClick={() => openWorkspace("viewer")}>
-                Explore Evidence Pack
+                Open Layer Viewer
               </button>
               {modelLink ? (
                 <a className="button-link" href={modelLink.url} target="_blank" rel="noreferrer">
@@ -325,78 +292,12 @@ export default function App() {
           </aside>
         </section>
 
-        <section className="insight-grid">
-          <article className="glass-panel benefits-panel">
-            <div className="panel-heading">
-              <span className="eyebrow">What SiteView gives you</span>
-              <h3>Visual site intelligence for planning and design</h3>
-            </div>
-            <div className="benefits-grid">
-              <article>
-                <strong>Full Site Context</strong>
-                <p>Understand the complete layout from one coordinated aerial interface instead of separate exports.</p>
-              </article>
-              <article>
-                <strong>Ground-Level Detail</strong>
-                <p>Connect the orthomosaic, 3D model and panorama viewpoints so the site reads clearly to every stakeholder.</p>
-              </article>
-              <article>
-                <strong>Planning Evidence</strong>
-                <p>Use legible visual material to support access, visibility, amenity and impact discussions.</p>
-              </article>
-              <article>
-                <strong>Client-Friendly Delivery</strong>
-                <p>Package drone data, map outputs and technical drawings into one simple online viewer.</p>
-              </article>
-            </div>
-          </article>
-
-          <article className="glass-panel panorama-panel">
-            <div className="panel-heading">
-              <span className="eyebrow">Viewpoint preview</span>
-              <h3>{activeViewpoint.title}</h3>
-            </div>
-            {mainLayer ? <img className="panorama-preview-image" src={mainLayer.file} alt={`${activeViewpoint.title} preview`} /> : null}
-            <div className="panorama-panel__footer">
-              <div>
-                <strong>{activeViewpoint.label}</strong>
-                <p>Structured viewpoint sequence for site explanation and review.</p>
-              </div>
-              <button type="button" onClick={() => hasPanorama ? setPanoramaOpen(true) : openWorkspace("viewer")}>
-                {hasPanorama ? "Open Panorama" : "Open Viewer"}
-              </button>
-            </div>
-          </article>
-
-          <article className="glass-panel map-layers-panel">
-            <div className="panel-heading">
-              <span className="eyebrow">Site intelligence</span>
-              <h3>Map layers</h3>
-            </div>
-            <div className="map-layers-list">
-              {mapLayers.map((layer) => {
-                const checked = selectedMapLayers.includes(layer.id);
-                return (
-                  <label className={`map-layer-row ${checked ? "is-active" : ""}`} key={layer.id}>
-                    <input
-                      checked={checked}
-                      type="checkbox"
-                      onChange={() => toggleMapLayer(layer.id)}
-                    />
-                    <span>{layer.label}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </article>
-        </section>
-
         <section className="workspace-section" id="viewer" ref={workspaceRef}>
           <div className="section-heading">
-            <span className="eyebrow">Interactive workspace</span>
-            <h2>Working layers, drawings and support files</h2>
+            <span className="eyebrow">Primary workspace</span>
+            <h2>Layer viewer, drawings and support files</h2>
             <p>
-              Move from the cinematic site overview into the technical viewer. Compare layers, open the panorama,
+              Start with the main technical viewer. Compare layers, inspect the ortho closely, open the panorama,
               and download deliverables from one place.
             </p>
           </div>
@@ -421,22 +322,65 @@ export default function App() {
           {activeTab === "help" ? <HelpPanel layers={config.layerImages || []} /> : null}
         </section>
 
-        <section className="cta-panel" id="contact" ref={contactRef}>
-          <div>
-            <span className="eyebrow">Build a SiteView for your project</span>
-            <h2>Turn drone mapping, 3D models, panoramas and site evidence into one clear visual platform.</h2>
-          </div>
-          <div className="cta-panel__actions">
-            <a className="button-link button-link--primary" href="mailto:hello@futurescapinglabs.com">
-              Contact FutureScaping
-            </a>
-            {modelLink ? (
-              <a className="button-link" href={modelLink.url} target="_blank" rel="noreferrer">
-                Review live 3D model
-              </a>
-            ) : null}
-          </div>
+        <section className="insight-grid">
+          <article className="glass-panel panorama-panel">
+            <div className="panel-heading">
+              <span className="eyebrow">Viewpoint preview</span>
+              <h3>{activeViewpoint.title}</h3>
+            </div>
+            {mainLayer ? <img className="panorama-preview-image" src={mainLayer.file} alt={`${activeViewpoint.title} preview`} /> : null}
+            <div className="panorama-panel__footer">
+              <div>
+                <strong>{activeViewpoint.label}</strong>
+                <p>Structured viewpoint sequence for site explanation and review.</p>
+              </div>
+              <button type="button" onClick={() => hasPanorama ? setPanoramaOpen(true) : openWorkspace("viewer")}>
+                {hasPanorama ? "Open Panorama" : "Open Viewer"}
+              </button>
+            </div>
+          </article>
+
+          <article className="glass-panel benefits-panel">
+            <div className="panel-heading">
+              <span className="eyebrow">Survey summary</span>
+              <h3>Key reading points for this site pack</h3>
+            </div>
+            <div className="benefits-grid">
+              <article>
+                <strong>Clean Ortho Base</strong>
+                <p>Review the uncluttered orthomosaic first, then bring the other layers in only when they add value.</p>
+              </article>
+              <article>
+                <strong>Level Comparison</strong>
+                <p>Switch between ortho, DSM and contour overlay views to read terrain changes with more confidence.</p>
+              </article>
+              <article>
+                <strong>Viewpoint Context</strong>
+                <p>Use the panorama and preview panel together to anchor the survey outputs in real on-site context.</p>
+              </article>
+              <article>
+                <strong>Download Ready</strong>
+                <p>Keep the viewer for exploration, then pull the exact exported files you need from the outputs tab.</p>
+              </article>
+            </div>
+          </article>
         </section>
+
+        <footer className="site-footer">
+          <div className="site-footer__legal">
+            <span>Cookies</span>
+            <span>Privacy</span>
+            <span>Copyright {copyrightYear}</span>
+          </div>
+          <div className="site-footer__credit">
+            <span>Created by</span>
+            <a href={footerLink} target="_blank" rel="noreferrer">
+              Futurescaping
+            </a>
+            <span>All rights reserved.</span>
+          </div>
+        </footer>
+
       </main>
 
       {hasPanorama ? (
